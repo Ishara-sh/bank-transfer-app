@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Large Transfers</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Large Transfers</h1>
+        <p>Transfers above the selected amount</p>
+    </header>
+
+    <section class="card">
+
+        <form action="/large-transfers" method="get">
+
+            <label>Minimum Amount</label>
+
+            <input type="number"
+                   name="min"
+                   min="0"
+                   step="0.01"
+                   th:value="${min}">
+
+            <button type="submit">Search</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Matching Transactions</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="transaction : ${transactions}">
+
+                        <td th:text="${transaction.id}"></td>
+                        <td th:text="${transaction.fromAccount}"></td>
+                        <td th:text="${transaction.toAccount}"></td>
+
+                        <td th:text="'LKR ' + ${#numbers.formatDecimal(transaction.amount, 1, 2)}"></td>
+
+                        <td th:text="${transaction.status}"></td>
+
+                        <td th:text="${#temporals.format(transaction.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(transactions)}">
+                        <td colspan="6">No matching transfers found.</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <a href="/" class="secondary-button">Back to Dashboard</a>
+
+    </section>
+
+</div>
+
+</body>
+</html>
