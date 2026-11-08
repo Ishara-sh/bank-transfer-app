@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.bankapp.dto.TransferRequest;
-import com.example.bankapp.exception.BankException;
+
 import com.example.bankapp.model.Customer;
 import com.example.bankapp.service.BankService;
 import com.example.bankapp.service.TransactionAuditService;

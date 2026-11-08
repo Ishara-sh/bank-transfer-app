@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Transfer System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>Bank Transfer System</h1>
+        <p>Customer Accounts and Transaction Management</p>
+    </header>
+
+    <div th:if="${successMessage}" class="alert success"
+         th:text="${successMessage}"></div>
+
+    <div th:if="${errorMessage}" class="alert error"
+         th:text="${errorMessage}"></div>
+
+    <section class="statistics">
+
+        <div class="stat-card">
+            <h3>Total Bank Balance</h3>
+            <h2 th:text="'LKR ' + ${#numbers.formatDecimal(totalBalance, 1, 2)}"></h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Successful Transactions</h3>
+            <h2 th:text="${successCount}"></h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Failed Transactions</h3>
+            <h2 th:text="${failedCount}"></h2>
+        </div>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Transfer Money</h2>
+
+        <form th:action="@{/transfer}"
+              th:object="${transferRequest}"
+              method="post">
+
+            <label>Sender Account Number</label>
+
+            <select th:field="*{fromAccount}" required>
+                <option value="">Select Sender</option>
+                <option th:each="c : ${customers}"
+                        th:value="${c.accountNumber}"
+                        th:text="${c.accountNumber + ' - ' + c.fullName}">
+                </option>
+            </select>
+
+            <label>Receiver Account Number</label>
+
+            <select th:field="*{toAccount}" required>
+                <option value="">Select Receiver</option>
+                <option th:each="c : ${customers}"
+                        th:if="${c.accountNumber != '999999'}"
+                        th:value="${c.accountNumber}"
+                        th:text="${c.accountNumber + ' - ' + c.fullName}">
+                </option>
+            </select>
+
+            <label>Amount (LKR)</label>
+
+            <input type="number"
+                   step="0.01"
+                   min="0.01"
+                   th:field="*{amount}"
+                   placeholder="Enter amount">
+
+            <div class="checkbox">
+                <input type="checkbox"
+                       th:field="*{simulateFailure}">
+                <label>Simulate a system failure</label>
+            </div>
+
+            <button type="submit">Transfer Money</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Add New Customer</h2>
+
+        <form th:action="@{/customers}" method="post">
+
+            <label>Account Number</label>
+            <input type="text" name="accountNumber" required>
+
+            <label>Full Name</label>
+            <input type="text" name="fullName" required>
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Initial Balance (LKR)</label>
+            <input type="number" name="balance"
+                   step="0.01" min="0" required>
+
+            <button type="submit">Add Customer</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Deposit Money</h2>
+
+        <form th:action="@{/deposit}" method="post">
+
+            <label>Account Number</label>
+            <input type="text" name="accountNumber" required>
+
+            <label>Amount</label>
+            <input type="number" name="amount"
+                   min="0.01" step="0.01" required>
+
+            <button type="submit">Deposit</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Withdraw Money</h2>
+
+        <form th:action="@{/withdraw}" method="post">
+
+            <label>Account Number</label>
+            <input type="text" name="accountNumber" required>
+
+            <label>Amount</label>
+            <input type="number" name="amount"
+                   min="0.01" step="0.01" required>
+
+            <button type="submit">Withdraw</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Transfer With 1% Fee</h2>
+
+        <form th:action="@{/transfer-with-fee}" method="post">
+
+            <label>Sender Account</label>
+            <input type="text" name="fromAccount" required>
+
+            <label>Receiver Account</label>
+            <input type="text" name="toAccount" required>
+
+            <label>Amount</label>
+            <input type="number" name="amount"
+                   min="0.01" step="0.01" required>
+
+            <button type="submit">Transfer With Fee</button>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Customer Accounts</h2>
+
+        <form action="/" method="get" class="search-form">
+            <input type="text" name="keyword"
+                   placeholder="Search customer name"
+                   th:value="${keyword}">
+            <button type="submit">Search</button>
+            <a href="/" class="secondary-button">Clear</a>
+        </form>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Account Number</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Balance</th>
+                        <th>History</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="customer : ${customers}">
+
+                        <td th:text="${customer.accountNumber}"></td>
+
+                        <td th:text="${customer.fullName}"></td>
+
+                        <td th:text="${customer.email}"></td>
+
+                        <td th:text="'LKR ' + ${#numbers.formatDecimal(customer.balance, 1, 2)}"></td>
+
+                        <td>
+                            <a class="view-button"
+                               th:href="@{/accounts/{accountNumber}/history(accountNumber=${customer.accountNumber})}">
+                                View
+                            </a>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Latest Transactions</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="transaction : ${transactions}">
+
+                        <td th:text="${transaction.id}"></td>
+
+                        <td th:text="${transaction.fromAccount}"></td>
+
+                        <td th:text="${transaction.toAccount}"></td>
+
+                        <td th:text="'LKR ' + ${#numbers.formatDecimal(transaction.amount, 1, 2)}"></td>
+
+                        <td>
+                            <span th:text="${transaction.status}"
+                                  th:class="${transaction.status.name() == 'SUCCESS'} ? 'status-success' : 'status-failed'">
+                            </span>
+                        </td>
+
+                        <td th:text="${transaction.description}"></td>
+
+                        <td th:text="${#temporals.format(transaction.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Large Transfers</h2>
+
+        <p>View transfers above a specified amount.</p>
+
+        <a href="/large-transfers?min=10000"
+           class="view-button">View Large Transfers</a>
+
+    </section>
+
+</div>
+
+</body>
+</html>

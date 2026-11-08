@@ -14,6 +14,7 @@ import com.example.bankapp.model.Customer;
 import com.example.bankapp.model.TransactionStatus;
 import com.example.bankapp.repository.BankTransactionRepository;
 import com.example.bankapp.repository.CustomerRepository;
+import org.springframework.transaction.annotation.Propagation;
 
 import lombok.RequiredArgsConstructor;
 
@@ -84,6 +85,7 @@ public class BankService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    //@Transactional(propagation = Propagation.SUPPORTS)
     public BankTransaction transfer(
             String fromAccount,
             String toAccount,
@@ -98,9 +100,9 @@ public class BankService {
             throw new BankException("Amount must be greater than zero");
         }
 
-        Customer sender = customerRepository.getByAccountNumber(fromAccount)
-                .orElseThrow(() -> new AccountNotFoundException(
-                        "Sender account not found"));
+        customerRepository.getByAccountNumber(fromAccount)
+        .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
+
 
         customerRepository.getByAccountNumber(toAccount)
                 .orElseThrow(() -> new AccountNotFoundException(
